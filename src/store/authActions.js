@@ -6,9 +6,6 @@ import * as actionTypes from './actionTypes';
 import axios from '../../axios-config';
 
 export const logInUser = (email, password) => (dispatch) => {
-        // the following dispatched action will do just to activate loading
-        // dispatch(authStart());
-
         // now for the async call
         const authData = {
             user: {
@@ -21,15 +18,14 @@ export const logInUser = (email, password) => (dispatch) => {
             .post('/session', authData)
             .then((response) => {
                 // store token on localStorage
-                // const expirationDate = new Date(
-                //   new Date().getTime() + response.data.expiresIn * 1000
-                // ); // this will give us a fixed datetime: the date at the moment (in milliseconds plus the milliseconds correspondent to the expiration datetime)
+                let expirationDate = new Date();
+                expirationDate.setMinutes( expirationDate.getMinutes() + 30 ); // this will give us a fixed datetime: the date at the moment (in milliseconds plus the milliseconds correspondent to the expiration datetime)
                 localStorage.setItem('sessionToken', response.data['User-Token']);
-                // localStorage.setItem('expirationDate', expirationDate);
+                localStorage.setItem('expirationDate', expirationDate);
                 // localStorage.setItem('userId', response.data.localId);
                 // async call was success
                 dispatch(authSuccess(localStorage.getItem('sessionToken')));
-                // dispatch(checkSessionTokenTimeout(localStorage.getItem('expirationDate')));
+                dispatch(checkSessionTokenTimeout(localStorage.getItem('expirationDate')));
             })
             .catch((error) => {
                 // async call was a failure
@@ -39,38 +35,41 @@ export const logInUser = (email, password) => (dispatch) => {
 
 const checkSessionTokenTimeout = expirationTime => (dispatch) => {
         setTimeout(() => {
-            dispatch(logout());
-        }, expirationTime * 1000);
+            logout(dispatch);
+        }, expirationTime);
     };
 
-export const logout = () => {
+export const logout = () => (dispatch) => {
 
     axios.delete('/session')
     .then((response) => {
         console.log(response.data.message);
+        dispatch(endSession());
     })
-    .catch(error => {
-        console.log(error);
+    .catch((error) => {
+        console.log(error.data.message);
+    }).finally(() => {
+        // clean localStorage
+        console.log(localStorage.getItem('sessionToken'));
+        localStorage.removeItem('sessionToken');
     });
-    // clean localStorage
-    localStorage.removeItem('sessionToken');
-    // localStorage.removeItem('expirationDate');
-    // localStorage.removeItem('userId');
+};
+
+const endSession = () => {
     return {
         type: actionTypes.AUTH_LOGOUT
     };
-};
-
-const authStart = () => ({
-        type: actionTypes.AUTH_START
-    });
+}
 
 // here we'll have to get the session token and the user id
-const authSuccess = (sessionToken) => ({
+const authSuccess = (sessionToken) => {
+    console.log(axios.defaults.headers);
+    //axios.defaults.headers.Authorization = 'Token token=' + sessionToken;
+    return {
         type: actionTypes.AUTH_SUCCESS,
         sessionToken: sessionToken,
-        // userId: userId
-    });
+    }
+}; 
 
 const authFail = errorObject => ({
         type: actionTypes.AUTH_FAIL,
@@ -79,7 +78,7 @@ const authFail = errorObject => ({
 
 export const setAuthPathRedirect = path => ({
         type: actionTypes.AUTH_PATH_REDIRECT,
-        path: path
+        path: path,
     });
 
 export const checkIfAuthIsStillValid = () => dispatch => {

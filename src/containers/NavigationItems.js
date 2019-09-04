@@ -1,5 +1,6 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable react/jsx-filename-extension */
-import React, { Link } from "react";
+import React from "react";
 import './NavigationItems.scss';
 import NavigationItem from "./NavigationItem";
 
@@ -10,8 +11,11 @@ const navigationItems = (props) => {
       {!props.isAuthenticated ? (
         <NavigationItem link="/auth">Login</NavigationItem>
       ) : (
-        <NavigationItem link="/logout">Logout</NavigationItem>
-      )}
+        <React.Fragment>
+          <NavigationItem link="/logout">My Fav Quotes</NavigationItem>
+          <NavigationItem link="/logout">Logout</NavigationItem>
+        </React.Fragment>
+        )}
     </ul>
   );
 };

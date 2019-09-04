@@ -3,7 +3,6 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import "./Auth.scss";
 import { Redirect } from "react-router-dom";
-//import Spinner from "../../stateless_components/UI/UI_elements/Spinner/Spinner";
 import Input from "./Input";
 import Button from "./Button";
 import * as actions from "../store/authActions";
@@ -44,8 +43,7 @@ export class Authenticator extends Component {
           valid: false,
           touched: false
         }
-      },
-      //isSignUp: true
+      }
     }
 
     this.inputChangedHandler = auxActions.inputChangedHandler.bind(this);
@@ -85,11 +83,6 @@ export class Authenticator extends Component {
       />
     ));
 
-    // checking if we're on loading state
-    // if (this.props.loading) {
-    //   form = <Spinner />;
-    // }
-
     // // checking if we've had an error
     let errorMessage = null;
     if (this.props.error) {
@@ -119,9 +112,8 @@ const mapStateToProps = state => {
   return {
     loading: state.loading,
     error: state.error,
-    isUserAuthenticated: state.token !== null,
-    buildingBurguer: state.building,
-    redirectpath: state.authRedirectPath
+    isUserAuthenticated: state.authReducer.token !== null,
+    redirectpath: state.authReducer.authRedirectPath
   };
 };
 
@@ -141,5 +133,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(Authenticator);
-
-// export default Auth;
