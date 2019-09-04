@@ -6,5 +6,7 @@
     "es6": true,
     "mocha": true
   },
-  "rules": {}
+  "rules": {
+    "import/no-named-as-default": 0
+  }
 }
