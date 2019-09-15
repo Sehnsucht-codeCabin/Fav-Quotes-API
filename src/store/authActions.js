@@ -1,3 +1,5 @@
+/* eslint-disable linebreak-style */
+/* eslint-disable prefer-template */
 /* eslint-disable no-use-before-define */
 /* eslint-disable indent */
 /* eslint-disable linebreak-style */
@@ -9,17 +11,19 @@ export const logInUser = (email, password) => (dispatch) => {
         // now for the async call
         const authData = {
             user: {
-                login: email,
-                password: password,
-              }
-        }
+                // login: email,
+                // password: password,
+                login: 'marc.e.mailing@gmail.com',
+                password: 'favqS_05',
+            },
+        };
 
         axios
             .post('/session', authData)
             .then((response) => {
                 // store token on localStorage
-                let expirationDate = new Date();
-                expirationDate.setMinutes( expirationDate.getMinutes() + 30 ); // this will give us a fixed datetime: the date at the moment (in milliseconds plus the milliseconds correspondent to the expiration datetime)
+                const expirationDate = new Date();
+                expirationDate.setMinutes(expirationDate.getMinutes() + 30); // this will give us a fixed datetime: the date at the moment (in milliseconds plus the milliseconds correspondent to the expiration datetime)
                 localStorage.setItem('sessionToken', response.data['User-Token']);
                 localStorage.setItem('expirationDate', expirationDate);
                 // localStorage.setItem('userId', response.data.localId);
@@ -40,31 +44,24 @@ const checkSessionTokenTimeout = expirationTime => (dispatch) => {
     };
 
 export const logout = () => (dispatch) => {
-
     axios.delete('/session')
     .then((response) => {
         console.log(response.data.message);
-        dispatch(endSession());
+        localStorage.removeItem('sessionToken');
+        localStorage.removeItem('expirationDate');
+        //dispatch(endSession());
     })
     .catch((error) => {
         console.log(error.data.message);
-    }).finally(() => {
-        // clean localStorage
-        console.log(localStorage.getItem('sessionToken'));
-        localStorage.removeItem('sessionToken');
     });
 };
 
-const endSession = () => {
-    return {
-        type: actionTypes.AUTH_LOGOUT
-    };
-}
+// const endSession = () => ({
+//     type: actionTypes.AUTH_LOGOUT,
+// });
 
 // here we'll have to get the session token and the user id
 const authSuccess = (sessionToken) => {
-    console.log(axios.defaults.headers);
-    //axios.defaults.headers.Authorization = 'Token token=' + sessionToken;
     return {
         type: actionTypes.AUTH_SUCCESS,
         sessionToken: sessionToken,
@@ -73,7 +70,7 @@ const authSuccess = (sessionToken) => {
 
 const authFail = errorObject => ({
         type: actionTypes.AUTH_FAIL,
-        error: errorObject
+        error: errorObject,
     });
 
 export const setAuthPathRedirect = path => ({

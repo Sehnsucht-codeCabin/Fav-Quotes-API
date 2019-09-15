@@ -1,16 +1,19 @@
 /* eslint-disable linebreak-style */
+/* eslint-disable react/self-closing-comp */
+/* eslint-disable react/destructuring-assignment */
+/* eslint-disable react/prop-types */
+/* eslint-disable linebreak-style */
 /* eslint-disable react/jsx-indent */
 /* eslint-disable react/jsx-filename-extension */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import "./Home.scss";
+import './Home.scss';
 import axios from '../../axios-config';
 import ToolBar from './ToolBar';
-import PublicQuotes from "./PublicQuotes";
+import PublicQuotes from './PublicQuotes';
 import { setPublicQuotes } from '../store/favQuotesActions';
 
 class Home extends Component {
-
   constructor() {
     super();
     this.quoteBody = React.createRef();
@@ -18,12 +21,9 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    if (!this.props.isAuthenticated) {
+    if (!this.props.isAuthenticated || this.props.location.logout === true) {
       axios.get('/qotd')
         .then((response) => {
-          // remove session token?
-
-          //console.log(localStorage.getItem('sessionToken'));
           // handle success
           this.quoteBody.current.innerHTML = response.data.quote.body;
           this.quoteAuthor.current.innerHTML = response.data.quote.author;
@@ -37,14 +37,13 @@ class Home extends Component {
         .then((response) => {
           // handle success
           this.props.getPublicQuotes(response.data.quotes);
-          console.log(response.data.quotes);
+          //console.log(response.data.quotes);
         })
         .catch((error) => {
           // handle error
           console.log(error);
         });
     }
-
   }
 
   render() {
@@ -52,7 +51,7 @@ class Home extends Component {
       <main className="container">
         <div>
           <ToolBar />
-          {!this.props.isAuthenticated ? (
+          {!this.props.isAuthenticated || this.props.location.logout === true ? (
             <div className="quoteWrapper">
               <p id="quoteBody" ref={this.quoteBody}></p>
               <p id="quoteAuthor" ref={this.quoteAuthor}></p>
@@ -65,24 +64,14 @@ class Home extends Component {
 
 
         </div>
-        {/* <ul className="left">
-            <li>
-            <Link to="/">Home</Link>
-            </li>
-            <li>
-            <Link to="/about">About</Link>
-            </li>
-        </ul> */}
       </main>
-    )
+    );
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    isAuthenticated: state.authReducer.token !== null,
-  };
-};
+const mapStateToProps = state => ({
+  isAuthenticated: state.authReducer.token !== null,
+});
 
 const mapDispatchToProps = (dispatch) => {
   return {

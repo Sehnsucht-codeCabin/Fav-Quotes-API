@@ -13,7 +13,6 @@ export const inputChangedHandler = (value, formIdentifier, requiredObject, isTes
     
         if (rules.required) {
             isValid = value.trim() !== "" && isValid;
-            console.log("got here");
         }
     
         if (rules.minlength) {

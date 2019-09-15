@@ -2,7 +2,7 @@
 import * as actionTypes from './actionTypes';
 
 const initialState = {
-  token: null,
+  token: localStorage.getItem('sessionToken') ? localStorage.getItem('sessionToken') : null,
   userId: null,
   error: null,
   loading: false,
@@ -15,11 +15,11 @@ const updateState = (oldState, newState) => ({ ...oldState, ...newState });
 // my reducer
 const authReducer = (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.AUTH_START:
-      return updateState(state, {
-        error: null,
-        loading: true,
-      });
+    // case actionTypes.AUTH_START:
+    //   return updateState(state, {
+    //     error: null,
+    //     loading: true,
+    //   });
 
     case actionTypes.AUTH_SUCCESS:
       return updateState(state, {
@@ -37,7 +37,7 @@ const authReducer = (state = initialState, action) => {
 
     case actionTypes.AUTH_LOGOUT:
       return updateState(state, {
-        token: null,
+        token: state.token,
         userId: null,
       });
 
