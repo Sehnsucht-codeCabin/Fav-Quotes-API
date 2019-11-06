@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-filename-extension */
 /* eslint-disable import/no-extraneous-dependencies */
 /*
   issue with react-hot-loader
@@ -10,10 +11,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 // hot reload for development
 import { AppContainer } from 'react-hot-loader';
-
-import App from './App';
-
+// styles
 import './style.scss';
+// main component
+import App from './App';
 
 const root = document.getElementById('root');
 

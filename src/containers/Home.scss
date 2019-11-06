@@ -1,3 +1,29 @@
-.quoteWrapper{
-    margin-top: 150px;
+@charset "utf-8";
+
+// Import a Google Font
+@import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
+
+.main {
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.centered-content {
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.quote-wrapper{
+    text-align: left;
+    background-color: #f6f6f6;
+    box-sizing: border-box;
+    padding: 30px;
+    border-radius: 15px;
+
+    > p {
+        margin: 0;
+    }
 }

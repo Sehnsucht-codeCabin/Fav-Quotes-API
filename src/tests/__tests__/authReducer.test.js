@@ -1,33 +1,34 @@
 /* eslint-disable linebreak-style */
 /* eslint-disable no-undef */
-/* eslint-disable indent */
 import reducer from '../../store/authReducer';
-import * as actionTypes from '../../store/actionTypes';
+import * as actionTypes from '../../store/action-types';
 
 describe('auth', () => {
-    it('should login in user', () => {
-        expect(reducer(undefined, {
-            type: actionTypes.AUTH_SUCCESS,
-            sessionToken: 'token',
-        })).toEqual({
-            token: 'token',
-            userId: null,
-            error: null,
-            loading: false,
-            authRedirectPath: '/',
-        });
-    });
 
-    it('should logout user', () => {
-        expect(reducer(undefined, {
-            type: actionTypes.AUTH_LOGOUT,
-        })).toEqual({
-            token: null,
-            userId: null,
-            error: null,
-            loading: false,
-            authRedirectPath: '/',
-        });
+  let initialState;
+
+  beforeEach(() => {
+    initialState = {
+      token: localStorage.getItem('sessionToken') ? localStorage.getItem('sessionToken') : null,
+      userId: null,
+      error: null,
+      loading: false,
+      sessionNotActive: localStorage.getItem('notActiveSession') ? localStorage.getItem('notActiveSession') : 'true',
+    };
+  });
+
+  it('should login in user', () => {
+    expect(reducer(initialState, {
+      type: actionTypes.AUTH_SUCCESS,
+      payload: {
+        token: localStorage.getItem('sessionToken'),
+      },
+    })).toEqual({
+      token: localStorage.getItem('sessionToken'),
+      userId: null,
+      error: null,
+      loading: false,
+      sessionNotActive: localStorage.getItem('notActiveSession'),
     });
-    
+  });
 });

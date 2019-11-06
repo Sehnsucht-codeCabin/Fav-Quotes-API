@@ -1,41 +1,50 @@
+/* eslint-disable react/jsx-filename-extension */
 /* eslint-disable no-undef */
 import React from 'react';
-import mockAxios from 'jest-mock-axios';
-// the shallow component render our Component in a 'shallow' way, I mean, kind of a placeholder without rendering a whole subtree of components
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import Home from '../../containers/Home';
+import { Home } from '../../containers/Home';
 
 // enzyme is connected
 configure({
   adapter: new Adapter(),
+  disableLifecycleMethods: false,
 });
 
 describe('tests for Home.js', () => {
   let wrapper;
+
   beforeEach(() => {
-    wrapper = shallow(<Home />);
+    const initialProps = {
+      isAuthenticated: false,
+      getPublicQuotes: jest.fn(),
+      logout: jest.fn(),
+      setNotActiveSession: jest.fn(),
+      sessionNotActive: 'false',
+    };
+
+    wrapper = shallow(<Home {...initialProps} />);
   });
 
   it('should render App Component with no issues', () => {
     expect(wrapper.exists()).toEqual(true);
   });
 
-  it('should render random quote on dom', () => {
-    expect(wrapper.find('#quoteBody').text()).toBe('');
+  // check if daily quote was executed or not
+  it('should get daily quote', () => {
+    // set initial quote
+    wrapper.setState({
+      quote: {
+        body: 'Some quote',
+        author: 'John Doe',
+      },
+    });
+    expect(wrapper.find('#quote-body').text()).toBe('"Some quote"');
+
+    // unset initial quote (authenticated user)
+    wrapper.setProps({
+      isAuthenticated: true,
+    });
+    expect(wrapper.find('#quote-body').length).toBe(0);
   });
-
-  // it('fetches data from favquotes', () => {
-  //   let catchFn = jest.fn(),
-  //       thenFn = jest.fn();
-  //   UppercaseProxy('something here')
-  //       .then(thenFn)
-  //       .catch(catchFn);
-  //   // setup
-  //   // mockAxios.get.mockImplementationOnce(() => Promise.resolve({
-  //   //   data: { results: ["cat.jpg"] },
-  //   // }));
-  //   expect(mockAxios.get).toHaveBeenCalledWith('https://favqs.com/api/qotd');
-  // });
-
 });

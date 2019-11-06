@@ -1,35 +1,47 @@
-/* eslint-disable react/jsx-filename-extension */
-/* eslint-disable react/prop-types */
-/* eslint-disable react/destructuring-assignment */
 /* eslint-disable linebreak-style */
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import { Redirect } from "react-router-dom";
-import { logout } from "../store/authActions";
+/* eslint-disable no-shadow */
+/* eslint-disable react/jsx-filename-extension */
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { AUTH_LOGOUT } from '../store/action-types';
+import { logoutAux } from './LogoutAux';
 
 class Logout extends Component {
-
   componentDidMount() {
-    this.props.logout();
+    const { logout } = this.props;
+    logoutAux(logout);
   }
 
   render() {
-    // eslint-disable-next-line prefer-const
-    let props = {
-      pathname: '/',
-      logout: true,
-    };
-    return <Redirect to={props} />;
+    const { isAuthenticated } = this.props;
+    return !isAuthenticated ? <Redirect to="/" /> : null;
   }
 }
 
-const mapDispatchToProps = dispatch => {
+const mapStateToProps = state => ({
+  isAuthenticated: state.authReducer.token,
+});
+
+const mapDispatchToProps = (dispatch) => {
   return {
-    logout: () => dispatch(logout())
+    logout: () => dispatch({
+      type: AUTH_LOGOUT,
+    }),
   };
 };
 
+Logout.propTypes = {
+  isAuthenticated: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+  logout: PropTypes.func.isRequired,
+};
+
+Logout.defaultProps = {
+  isAuthenticated: null,
+};
+
 export default connect(
-  null,
-  mapDispatchToProps
+  mapStateToProps,
+  mapDispatchToProps,
 )(Logout);

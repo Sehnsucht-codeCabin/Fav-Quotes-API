@@ -1,79 +1,94 @@
-/* eslint-disable linebreak-style */
-/* eslint-disable guard-for-in */
-/* eslint-disable comma-dangle */
-/* eslint-disable linebreak-style */
-/* eslint-disable object-shorthand */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable react/prop-types */
-/* eslint-disable react/destructuring-assignment */
-/* eslint-disable linebreak-style */
 /* eslint-disable react/jsx-filename-extension */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import './Auth.scss';
 import { Redirect } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import Input from './Input';
 import Button from './Button';
-import * as actions from '../store/authActions';
-import * as auxActions from './authAuxActions';
+import logInUser from './authAuxActions';
+import { AUTH_SUCCESS, AUTH_FAIL } from '../store/action-types';
 
 export class Authenticator extends Component {
   constructor() {
     super();
-
     this.state = {
       controls: {
         email: {
           elementType: 'input',
           elementConfig: {
             type: 'email',
-            placeholder: 'Mail Address'
+            placeholder: 'e-mail address...',
           },
           value: '',
           validation: {
             required: true,
-            isEmail: true
+            isEmail: true,
           },
           valid: false,
-          touched: false
+          touched: false,
         },
         password: {
           elementType: 'input',
           elementConfig: {
             type: 'password',
-            placeholder: 'Password'
+            placeholder: 'password...',
           },
           value: '',
           validation: {
             required: true,
-            maxLength: 5
+            maxLength: 5,
           },
           valid: false,
-          touched: false
+          touched: false,
         }
       }
     };
 
-    this.inputChangedHandler = auxActions.inputChangedHandler.bind(this);
+    this.inputChangedHandler = this.inputChangedHandler.bind(this);
+    this.logInUser = logInUser.bind(this);
   }
 
-  submitForm = (event) => {
-    event.preventDefault();
-    this.props.onAuth(
-      this.state.controls.email.value,
-      this.state.controls.password.value,
-    );
-  };;
+  inputChangedHandler = (value, formIdentifier) => {
+    // props destructuring
+    const { controls } = this.state;
+    // check validity
+    const checkValidity = (rules) => {
+      const isValid = true;
+      if (!rules) return true;
+      if (rules.required) return value.trim() !== '' && isValid;
+      if (rules.minlength) return value.length >= rules.minlength && isValid;
+      if (rules.maxlength) return value.length <= rules.maxlength && isValid;
+      return isValid;
+    };
+
+    const updatedControls = {
+      ...controls,
+      [formIdentifier]: {
+        ...controls[formIdentifier],
+        value,
+        valid: checkValidity(
+          value,
+          controls[formIdentifier].validation,
+        ),
+        touched: true,
+      },
+    };
+
+    this.setState({ controls: updatedControls });
+  }
 
   render() {
-    // generate forms element array
+    const { isUserAuthenticated } = this.props;
+    const { controls } = this.state;
     const formElementsArray = [];
-    for (const key in this.state.controls) {
+
+    Object.keys(controls).forEach((key) => {
       formElementsArray.push({
-        key: key,
-        config: this.state.controls[key]
+        key,
+        config: controls[key],
       });
-    }
+    });
 
     // CONTACT FORM
     const form = formElementsArray.map(formElement => (
@@ -89,24 +104,23 @@ export class Authenticator extends Component {
       />
     ));
 
-    // checking if we've had an error
-    let errorMessage = null;
-    if (this.props.error) {
-      errorMessage = <p>{this.props.error.message}</p>;
-    }
-
     let authRedirect = null;
-    if (this.props.isUserAuthenticated) {
-      authRedirect = <Redirect to={this.props.redirectpath} />;
+    if (isUserAuthenticated) {
+      authRedirect = <Redirect to="/" />;
     }
 
     return (
       <div className="Auth">
         {authRedirect}
-        {errorMessage}
-        <form onSubmit={this.submitForm}>
+        <h2>Login</h2>
+        <form onSubmit={(event) => {
+          event.preventDefault();
+          this.logInUser(this);
+        }
+        }
+        >
           {form}
-          <Button btnType="Success">SUBMIT</Button>
+          <Button btnType="Success">Submit</Button>
         </form>
 
       </div>
@@ -114,18 +128,29 @@ export class Authenticator extends Component {
   }
 }
 
+Authenticator.defaultProps = {
+  isUserAuthenticated: null,
+};
+
+Authenticator.propTypes = {
+  isUserAuthenticated: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+};
+
 const mapStateToProps = state => ({
-  loading: state.loading,
-  error: state.error,
-  isUserAuthenticated: state.authReducer.token !== null,
-  redirectpath: state.authReducer.authRedirectPath,
+  isUserAuthenticated: state.authReducer.token,
 });
 
 // // CONFIG REDUCER: DISPATCH/RETURN ACTIONS (AS CERTAIN TYPES) TO PROPS
 const mapDispatchToProps = dispatch => ({
-  onAuth: (email, password) => {
-    dispatch(actions.logInUser(email, password));
-  },
+  onSuccessAuth: () => dispatch({
+    type: AUTH_SUCCESS,
+    payload: {
+      token: localStorage.getItem('sessionToken'),
+    },
+  }),
+  onFailAuth: () => dispatch({
+    type: AUTH_FAIL,
+  })
 });
 
 export default connect(

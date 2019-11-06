@@ -1,0 +1,47 @@
+.quotes-wrapper {
+    margin: 130px 0 70px;
+
+    > h1 {
+        margin-bottom: 45px;
+        margin-top: 0;
+        text-align: center;
+    }
+}
+
+.quote {
+
+    list-style-type: none;
+    margin: 30px 0;
+    background-color: #f6f6f6;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: left;
+
+    button {
+        font-family: 'Nunito', sans-serif;
+        display: block;
+        margin: auto;
+        background-color: #5592ff;
+        border: none;
+        padding: 10px;
+        border-radius: 4px;
+        color: white;
+        font-size: 1.2em;
+        width: 30%;
+        cursor: pointer;
+    }
+
+    > div {
+
+        &:first-of-type {
+            margin-bottom: 15px;
+            line-height: 26px;
+        }
+
+        &:last-of-type {
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+        
+    }
+}

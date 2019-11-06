@@ -1,43 +1,37 @@
-export const inputChangedHandler = (value, formIdentifier, requiredObject, isTest = false) => {
+/* eslint-disable max-len */
+import axios from '../../axios-config';
 
-    // check current state
-    let myCurrentState = isTest ? requiredObject.state() : requiredObject.state;
-    // check validity
-    let checkValidity = (value, rules) => {
-        let isValid = true;
-    
-        // check if validation object exists (it does not on drop down field)
-        if (!rules) {
-            return true;
-        }
-    
-        if (rules.required) {
-            isValid = value.trim() !== "" && isValid;
-        }
-    
-        if (rules.minlength) {
-            isValid = value.length >= rules.minlength && isValid;
-        }
-    
-        if (rules.maxlength) {
-            isValid = value.length <= rules.maxlength && isValid;
-        }
-    
-        return isValid;
-    };
-    // update controls
-    const updatedControls = {
-        ...myCurrentState.controls,
-        [formIdentifier]: {
-            ...myCurrentState.controls[formIdentifier],
-            value: value,
-            valid: checkValidity(
-                value,
-                myCurrentState.controls[formIdentifier].validation
-            ),
-            touched: true
-        }
-    };
+const logInUser = (requiredComponent) => {
 
-    requiredObject.setState({ controls: updatedControls });
+  const authData = {
+    user: {
+      login: requiredComponent.state.controls.email.value,
+      password: requiredComponent.state.controls.password.value,
+    },
+  };
+
+  if (authData.user.login === '' || authData.user.password === '') {
+    // eslint-disable-next-line no-alert
+    alert('Email and password required!');
+    return;
+  }
+
+  axios
+    .post('/session', authData)
+    .then((response) => {
+      // check to see if there were validation error
+      if (response.data.error_code && response.data.error_code === 21 && response.data.message === 'Invalid login or password.') {
+        alert('ERROR! Invalid login or password.');
+      } else {
+        localStorage.setItem('sessionToken', response.data['User-Token']);
+        localStorage.setItem('userLogin', response.data.login);
+        localStorage.setItem('notActiveSession', 'false');
+        requiredComponent.props.onSuccessAuth();
+      }
+    })
+    .catch(() => {
+      requiredComponent.props.onFailAuth();
+    });
 }
+
+export default logInUser;

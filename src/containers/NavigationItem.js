@@ -1,10 +1,14 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
-import "./NavigationItem.scss";
+/* eslint-disable react/prop-types */
+/* eslint-disable linebreak-style */
+/* eslint-disable react/destructuring-assignment */
+/* eslint-disable react/jsx-filename-extension */
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import './NavigationItem.scss';
 
 const navigationItem = props => (
-  <li className="NavigationItem">
-    <NavLink to={props.link} activeClassName="active" exact={props.exact}>
+  <li className="nav-item">
+    <NavLink className="nav-link" to={props.link} activeClassName="active" exact={props.exact}>
       {props.children}
     </NavLink>
   </li>

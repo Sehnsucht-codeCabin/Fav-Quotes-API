@@ -1,3 +1,6 @@
+// make sure bootstrap styles get loaded...
+@import '~bootstrap/scss/bootstrap';
+
 .container {
     margin: auto;
     text-align: center;
