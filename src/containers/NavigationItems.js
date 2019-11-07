@@ -40,4 +40,4 @@ navigationItems.defaultProps = {
   isAuthenticated: null,
 };
 
-export default React.memo(navigationItems);
+export default navigationItems;
