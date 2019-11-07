@@ -1,7 +1,7 @@
 /* eslint-disable react/prefer-stateless-function */
 /* eslint-disable react/jsx-filename-extension */
 /* eslint-disable linebreak-style */
-import React, { PureComponent } from 'react';
+import React, { useState } from 'react';
 import './Quote.scss';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -9,24 +9,42 @@ import axios from '../../axios-config';
 import { AUTH_LOGOUT } from '../store/action-types';
 import { logoutAux } from './LogoutAux';
 
-class Quote extends PureComponent {
-  unfavQuote = (event, quote) => {
+const Quote = (props) => {
+  // current state
+  const btnStyleState = useState({
+    disabled: false,
+    backgroundColor: '#5592ff',
+    opacity: 1,
+    cursor: 'pointer',
+  });
+
+  const updateBtnStyle = () => {
+    btnStyleState[1](() => ({
+      disabled: true,
+      backgroundColor: '#ccc',
+      opacity: '.5',
+      cursor: 'inherit',
+    }));
+  };
+
+  const favOrUnfavQuote = (quote, isFavorite) => {
     // check if there's session
-    const { sessionNotActive, logout } = this.props;
+    const { sessionNotActive, logout } = props;
     if (sessionNotActive === 'true') {
       logoutAux(logout);
       return;
     }
-    const myEvent = event;
-    myEvent.target.disabled = true;
-    myEvent.target.style.backgroundColor = '#ccc';
-    myEvent.target.style.opacity = '.5';
-    myEvent.target.style.cursor = 'inherit';
+    // check if quote is disabled
+    if (btnStyleState[0].disabled) {
+      return;
+    }
     // add to favs
+    const favOrUnfav = isFavorite ? 'unfav' : 'fav';
     axios
-      .put(`/quotes/${quote.id}/unfav`)
+      .put(`/quotes/${quote.id}/${favOrUnfav}`)
       .then((response) => {
         console.log(response.data);
+        updateBtnStyle();
       })
       .catch((error) => {
         // async call was a failure
@@ -34,53 +52,39 @@ class Quote extends PureComponent {
       });
   };
 
-  favQuote = (event, quote) => {
-    // check if there's session
-    const { sessionNotActive, logout } = this.props;
-    if (sessionNotActive === 'true') {
-      logoutAux(logout);
-      return;
-    }
-    const myEvent = event;
-    myEvent.target.disabled = true;
-    myEvent.target.style.backgroundColor = '#ccc';
-    myEvent.target.style.opacity = '.5';
-    myEvent.target.style.cursor = 'inherit';
-    // add to favs
-    axios
-      .put(`/quotes/${quote.id}/fav`)
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        // async call was a failure
-        console.log(error);
-      });
-  };
-
-  render() {
-    const { quote } = this.props;
-    const {
-      quote: {
-        body: quoteBody,
-        author: quoteAuthor,
-        user_details: {
-          favorite: favoriteOrNot,
-        },
+  const { quote } = props;
+  const {
+    quote: {
+      body: quoteBody,
+      author: quoteAuthor,
+      user_details: {
+        favorite: favoriteOrNot,
       },
-    } = this.props;
+    },
+  } = props;
 
-    const btn = favoriteOrNot ? <button type="button" onClick={(event) => { this.unfavQuote(event, quote); }}>Unfav</button> : <button type="button" onClick={(event) => { this.favQuote(event, quote); }}>Add to Favs</button>;
+  const btn = (
+    <button
+      style={{
+        disabled: btnStyleState[0].disabled,
+        backgroundColor: btnStyleState[0].backgroundColor,
+        opacity: btnStyleState[0].opacity,
+        cursor: btnStyleState[0].cursor,
+      }}
+      type="button"
+      onClick={() => { favOrUnfavQuote(quote, favoriteOrNot); }}
+    >
+      {favoriteOrNot ? 'Unfav' : 'Add to Favs'}
+    </button>
+  );
 
-    return (
-      <li className="quote">
-        <div className="quote-body">{`"${quoteBody}"`}</div>
-        <div className="quote-author"><strong>{quoteAuthor}</strong></div>
-        {btn}
-      </li>
-    );
-  };
-
+  return (
+    <li className="quote">
+      <div className="quote-body">{`"${quoteBody}"`}</div>
+      <div className="quote-author"><strong>{quoteAuthor}</strong></div>
+      {btn}
+    </li>
+  );
 };
 
 const mapStateToProps = state => ({
