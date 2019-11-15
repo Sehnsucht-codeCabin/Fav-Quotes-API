@@ -1,7 +1,7 @@
-# HighStreet Mobile Web App
+# Fav Quotes API
 
 ## What is this -->
-This is a sample web app for HighStreet Mobile based on Fav Quotes [API](https://favqs.com/api). It was built on a simple [package](https://www.npmjs.com/package/simple-react-app) I stumbled upon when trying to find an alternative to the default 'create-react-app'.
+This is a sample web app based on Fav Quotes [API](https://favqs.com/api). It was built on a simple [package](https://www.npmjs.com/package/simple-react-app) I stumbled upon when trying to find an alternative to the default 'create-react-app'.
 
 Cheers!
 
