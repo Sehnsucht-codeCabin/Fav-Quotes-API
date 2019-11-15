@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import './Home.scss';
+import Spinner from 'react-spinner-material';
 import { setPublicQuotes } from '../store/favQuotesActions';
 import { AUTH_LOGOUT, NOT_ACTIVE_SESSION } from '../store/action-types';
 import { logoutAux, clearSession } from './LogoutAux';
@@ -23,6 +24,7 @@ class Home extends Component {
       },
     };
     this.getDailyQuote = this.getDailyQuote.bind(this);
+    this.displaySpinner = this.displaySpinner.bind(this);
   }
 
   componentDidMount() {
@@ -73,27 +75,39 @@ class Home extends Component {
       });
   }
 
+  displaySpinner = () => {
+    const { quote: { body, author } } = this.state;
+    let content;
+    if (author === '' && body === '') {
+      content = (
+        <div className="spinner">
+          <Spinner size={250} spinnerColor="#333" spinnerWidth={8} visible />
+        </div>
+      );
+    } else {
+      content = (
+        <div className="container mt-5" style={{ marginTop: '80px' }}>
+          <div className="card">
+            <div className="card-header h3 text-left font-weight-bold">Quote of the day</div>
+            <div className="card-body">
+              <blockquote className="blockquote mb-0">
+                <p id="quote-body" className="text-justify">{'"' + body + '"'}</p>
+                <footer className="blockquote-footer text-left">{author}</footer>
+              </blockquote>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return content;
+  };
+
   render() {
     const { isAuthenticated } = this.props;
-    const { quote: { body, author } } = this.state;
     return (
       <main className="main container-fluid px-0">
         <NavigationItems isAuthenticated={isAuthenticated} />
-        {!isAuthenticated ? (
-          <React.Fragment>
-            <div className="container mt-5" style={{ marginTop: '80px' }}>
-              <div className="card">
-                <div className="card-header h3 text-left font-weight-bold">Quote of the day</div>
-                <div className="card-body">
-                  <blockquote className="blockquote mb-0">
-                    <p id="quote-body" className="text-justify">{'"' + body + '"'}</p>
-                    <footer className="blockquote-footer text-left">{author}</footer>
-                  </blockquote>
-                </div>
-              </div>
-            </div>
-          </React.Fragment>
-        ) : (
+        {!isAuthenticated ? this.displaySpinner() : (
           <div className="quotes-wrapper">
             <h1>Public Quotes</h1>
             <PublicQuotes />
